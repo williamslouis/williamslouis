@@ -4,7 +4,6 @@
 
 ![C#](https://img.shields.io/badge/c%23-239120.svg?style=for-the-badge&logo=csharp&logoColor=white)
 ![Blender](https://img.shields.io/badge/blender-F5792A.svg?style=for-the-badge&logo=blender&logoColor=white)
-![Adobe Premiere Pro](https://img.shields.io/badge/Adobe%20Premiere%20Pro-9999FF.svg?style=for-the-badge&logo=adobepremierepro&logoColor=white)
 ![DaVinci Resolve](https://img.shields.io/badge/davinci%20resolve-233A51.svg?style=for-the-badge&logo=davinciresolve&logoColor=white)
 ![Unity](https://img.shields.io/badge/unity-000000.svg?style=for-the-badge&logo=unity&logoColor=white)
 
