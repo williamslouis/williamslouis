@@ -8,6 +8,7 @@
 ![DaVinci Resolve](https://img.shields.io/badge/davinci%20resolve-%23233A51.svg?style=for-the-badge&logo=davinciresolve&logoColor=white)
 ![Unity](https://img.shields.io/badge/unity-%23000000.svg?style=for-the-badge&logo=unity&logoColor=white)
 
+#
 ---
 
 ### Currently Learning
