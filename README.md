@@ -1,5 +1,7 @@
 ## Louis Williams 💻
 
+**'Developer and Content Creator'**
+
 Im Louis. Im mainly a VR developer, using Unity with C# for programming with Blender and Substance Painter for 3D assets. I also have experience with frontend web development using React, TS and Tailwind.
 
 I also make content, with many years of experience with video editing, photography and videography.
