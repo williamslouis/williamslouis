@@ -1,21 +1,4 @@
-## Louis Williams 💻
-
-**`Developer and Content Creator`**
-
-Im Louis. Im mainly a VR developer, using Unity with C# for programming with Blender and Substance Painter for 3D assets. I also have experience with frontend web development using React, TS and Tailwind.
-
-I also make content, with many years of experience with video editing, photography and videography.
-
-### My Skills
-
-![C#](https://img.shields.io/badge/c%23-239120.svg?style=for-the-badge&logo=csharp&logoColor=white)
-![Blender](https://img.shields.io/badge/blender-F5792A.svg?style=for-the-badge&logo=blender&logoColor=white)
-![DaVinci Resolve](https://img.shields.io/badge/davinci%20resolve-233A51.svg?style=for-the-badge&logo=davinciresolve&logoColor=white)
-![Adobe Premiere Pro](https://img.shields.io/badge/premiere%20pro-9999FF.svg?style=for-the-badge&logo=adobepremierepro&logoColor=white)
-![Unity](https://img.shields.io/badge/unity-000000.svg?style=for-the-badge&logo=unity&logoColor=white)
-![TypeScript](https://img.shields.io/badge/typescript-007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/react-20232a.svg?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Tailwind CSS](https://img.shields.io/badge/tailwindcss-06B6D4.svg?style=for-the-badge&logo=tailwindcss&logoColor=white)
+white)
 
 -----
 
@@ -28,4 +11,6 @@ I also make content, with many years of experience with video editing, photograp
 
 ### My Projects
 
-Marmo VR ![Website](https://marmovr.com)
+**Marmo VR** — [marmovr.com](https://marmovr.com)
+
+<img src="https://placehold.co/600x338" width="32%" />
