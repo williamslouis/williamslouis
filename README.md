@@ -36,7 +36,7 @@ I also make content, with many years of experience with video editing, photograp
 
 A hand-based locomotion styled, multiplayer VR game to play with friends with, PVP, Horror, Tag, and casual maps for gameplay.
 
-<div align="center">
+<div align="left">
 
  **Community Videos**
 
