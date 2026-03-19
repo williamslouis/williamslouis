@@ -1,5 +1,3 @@
----
-
 ### My Skills
 
 ![C#](https://img.shields.io/badge/c%23-239120.svg?style=for-the-badge&logo=csharp&logoColor=white)
@@ -7,7 +5,7 @@
 ![DaVinci Resolve](https://img.shields.io/badge/davinci%20resolve-233A51.svg?style=for-the-badge&logo=davinciresolve&logoColor=white)
 ![Unity](https://img.shields.io/badge/unity-000000.svg?style=for-the-badge&logo=unity&logoColor=white)
 
----
+-----
 
 ### Currently Learning
 
