@@ -32,7 +32,7 @@ I also make content, with many years of experience with video editing, photograp
 
 ### My Projects
 
-**Marmo VR** — [WEBSITE](https://marmovr.com)
+**Marmo VR** [![WEBSITE](https://img.shields.io/badge/Marmo%20VR-Website-000000?style=for-the-badge&logo=unity&logoColor=white)](https://marmovr.com)
 
 A hand-based locomotion styled, multiplayer VR game to play with friends with, PVP, Horror, Tag, and casual maps for gameplay.
 
