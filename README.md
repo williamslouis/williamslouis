@@ -30,5 +30,5 @@ I also make content, with many years of experience with video editing, photograp
 
 **Marmo VR** — [marmovr.com](https://marmovr.com)
 
-[![I TRIED THE MARMO VR XMAS UPDATE!!!](https://ytcards.demolab.com/?id=jo6NctCuI-A&title=I+TRIED+THE+MARMO+VR+XMAS+UPDATE!!!&lang=en&background_color=%230d1117&title_color=%23ffffff&stats_color=%23dedede&width=250&border_radius=5&max_title_lines=2 "I TRIED THE MARMO VR XMAS UPDATE!!!")](https://www.youtube.com/watch?v=jo6NctCuI-A)
-[![Marmo Release! | Marmo VR](https://ytcards.demolab.com/?id=aDHAZIc85pg&title=Marmo+Release%21+%7C+Marmo+VR&lang=en&background_color=%230d1117&title_color=%23ffffff&stats_color=%23dedede&width=250&border_radius=5&max_title_lines=2 "Marmo Release! | Marmo VR")](https://youtu.be/aDHAZIc85pg)
+[![I TRIED THE MARMO VR XMAS UPDATE!!!](https://ytcards.demolab.com/?id=jo6NctCuI-A&title=I+TRIED+THE+MARMO+VR+XMAS+UPDATE!!!&lang=en&background_color=%230d1117&title_color=%23ffffff&stats_color=%23dedede&width=250&border_radius=5&max_title_lines=1 "I TRIED THE MARMO VR XMAS UPDATE!!!")](https://www.youtube.com/watch?v=jo6NctCuI-A)
+[![Marmo Release! | Marmo VR](https://ytcards.demolab.com/?id=aDHAZIc85pg&title=Marmo+Release%21+%7C+Marmo+VR&lang=en&background_color=%230d1117&title_color=%23ffffff&stats_color=%23dedede&width=250&border_radius=5&max_title_lines=1 "Marmo Release! | Marmo VR")](https://youtu.be/aDHAZIc85pg)
