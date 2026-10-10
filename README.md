@@ -1,38 +1,21 @@
-<div align="center">
+# Hi, I'm Louis 👋
 
-# Louis Williams 💻
-**`Developer and Content Creator`**
+I make Unity games and React websites. I'm also a videographer, photographer and content creator.
 
-Im Louis. Im mainly a VR developer, using Unity with C# for programming with Blender and Substance Painter for 3D assets. I also have experience with frontend web development using React, TS and Tailwind.
-I also make content, with many years of experience with video editing, photography and videography.
+**Building with**
 
-</div>
+![Unity](https://img.shields.io/badge/unity-000000.svg?style=flat&logo=unity&logoColor=white)
+![C#](https://img.shields.io/badge/c%23-239120.svg?style=flat&logo=csharp&logoColor=white)
+![Blender](https://img.shields.io/badge/blender-F5792A.svg?style=flat&logo=blender&logoColor=white)
+![React](https://img.shields.io/badge/react-20232a.svg?style=flat&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/typescript-007ACC.svg?style=flat&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/tailwind-06B6D4.svg?style=flat&logo=tailwindcss&logoColor=white)
+![Premiere Pro](https://img.shields.io/badge/premiere%20pro-9999FF.svg?style=flat&logo=adobepremierepro&logoColor=white)
+![DaVinci Resolve](https://img.shields.io/badge/davinci%20resolve-233A51.svg?style=flat&logo=davinciresolve&logoColor=white)
 
----
+**Learning**
 
-### 🛠️ My Skills
+![Python](https://img.shields.io/badge/python-3776AB.svg?style=flat&logo=python&logoColor=white)
+![JavaScript](https://img.shields.io/badge/javascript-F7DF1E.svg?style=flat&logo=javascript&logoColor=black)
 
-![C#](https://img.shields.io/badge/c%23-239120.svg?style=for-the-badge&logo=csharp&logoColor=white)
-![Blender](https://img.shields.io/badge/blender-F5792A.svg?style=for-the-badge&logo=blender&logoColor=white)
-![DaVinci Resolve](https://img.shields.io/badge/davinci%20resolve-233A51.svg?style=for-the-badge&logo=davinciresolve&logoColor=white)
-![Adobe Premiere Pro](https://img.shields.io/badge/premiere%20pro-9999FF.svg?style=for-the-badge&logo=adobepremierepro&logoColor=white)
-![Unity](https://img.shields.io/badge/unity-000000.svg?style=for-the-badge&logo=unity&logoColor=white)
-![TypeScript](https://img.shields.io/badge/typescript-007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/react-20232a.svg?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Tailwind CSS](https://img.shields.io/badge/tailwindcss-06B6D4.svg?style=for-the-badge&logo=tailwindcss&logoColor=white)
-
----
-
-### 📚 Currently Learning
-
-![Git](https://img.shields.io/badge/git-F05033.svg?style=for-the-badge&logo=git&logoColor=white)
-![C++](https://img.shields.io/badge/c++-00599C.svg?style=for-the-badge&logo=cplusplus&logoColor=white)
-
----
-
-### My Projects
-
-[![WEBSITE](https://img.shields.io/badge/Marmo%20VR-Website-000000?style=for-the-badge&logo=unity&logoColor=white)](https://marmovr.com)
-
-A hand-based locomotion styled, multiplayer VR game to play with friends with, PVP, Horror, Tag, and casual maps for gameplay.
-
+**Project:** [Marmo VR](https://marmovr.com), a multiplayer VR game with hand-based movement and PvP, horror, tag and casual maps.
