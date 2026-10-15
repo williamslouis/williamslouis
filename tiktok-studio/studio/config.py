@@ -17,8 +17,6 @@ USER_AGENT = f"tiktok-studio/0.1 ({CONTACT})"
 
 LANG = os.environ.get("STUDIO_LANG", "en")
 
-MODEL = os.environ.get("STUDIO_MODEL", "claude-opus-5-5")
-
 # Topics that get a small boost in story ranking. Edit to steer the channel.
 INTERESTS = [
     "space", "moon", "rocket", "nasa", "apollo", "satellite",

@@ -1,5 +1,5 @@
 # Makes the day's posts every morning and sends them to Discord.
-# Needs: repo secret ANTHROPIC_API_KEY, repo secret STUDIO_DISCORD_WEBHOOK (optional),
+# Needs: repo secret GEMINI_API_KEY (free) or ANTHROPIC_API_KEY, STUDIO_DISCORD_WEBHOOK (optional),
 #        repo variables STUDIO_CONTACT and STUDIO_HANDLE.
 name: daily posts
 
@@ -33,6 +33,7 @@ jobs:
 
       - name: make today's posts
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           STUDIO_DISCORD_WEBHOOK: ${{ secrets.STUDIO_DISCORD_WEBHOOK }}
           STUDIO_CONTACT: ${{ vars.STUDIO_CONTACT }}

@@ -1,7 +1,7 @@
 # brand
 
 Working name: **set in `studio/config.py` (`HANDLE`)**. Everything below is the rulebook. The
-drafting step sends this whole file to Claude, so editing it changes every future post.
+drafting step sends this whole file to the AI, so editing it changes every future post.
 
 ---
 

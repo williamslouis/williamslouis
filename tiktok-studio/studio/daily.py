@@ -13,7 +13,7 @@ import os
 import shutil
 from datetime import date
 
-from . import config, draft, find, images, render
+from . import config, draft, find, images, llm, render
 
 MIX = [m.strip() for m in os.environ.get("STUDIO_MIX", "news,history,history").split(",")]
 TIMES = [t.strip() for t in os.environ.get("STUDIO_TIMES", "08:00,13:00,19:00").split(",")]
@@ -50,8 +50,7 @@ def _brand_section(title):
 
 
 def editor_pick(cands, mix):
-    """Ask Claude to choose like an editor: ranked order per slot, best first, with reserves."""
-    import anthropic
+    """Ask the AI to choose like an editor: ranked order per slot, best first, with reserves."""
 
     recent = sorted(config.POSTS_DIR.glob("*/post.json"), key=lambda p: p.stat().st_mtime)[-30:]
     recent_titles = [json.loads(p.read_text()).get("title", "") for p in recent]
@@ -66,16 +65,11 @@ def editor_pick(cands, mix):
         f"Recent posts: {json.dumps(recent_titles)}\n\n"
         f"Candidates:\n{json.dumps(shortlist, ensure_ascii=False)}"
     )
-    response = anthropic.Anthropic().beta.messages.create(
-        model=config.MODEL, max_tokens=8000,
-        output_config={"effort": "low", "format": {"type": "json_schema", "schema": PICK_SCHEMA}},
-        betas=["server-side-fallback-2026-07-01"], fallbacks="default",
-        messages=[{"role": "user", "content": prompt}],
-    )
-    text = next((b.text for b in response.content if b.type == "text"), "")
+    picks = llm.write("You are the editor of a minimal history and news account.", prompt,
+                      PICK_SCHEMA, effort="low")["picks"]
     by_id = {c["id"]: c for c in cands}
     return [({**by_id[p["id"]], "slot": p["slot"]}, p["angle"])
-            for p in json.loads(text or '{"picks": []}')["picks"] if p["id"] in by_id]
+            for p in picks if p["id"] in by_id]
 
 
 def heuristic_pick(cands, mix):
@@ -97,6 +91,7 @@ def _make(cand, angle, fmt):
 def run(day=None, fmt="3x4", mix=None, use_editor=True, send=True):
     day = day or date.today()
     mix = mix or MIX
+    print(f"• ai: {llm.provider()} ({llm.model_name()})")
     cands = find.run(day, days=1, views=True, use_rss=True, top=40)
     find.save(cands, day)
 

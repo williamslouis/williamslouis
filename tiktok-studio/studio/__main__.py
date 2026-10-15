@@ -73,7 +73,7 @@ def main():
     y.add_argument("--date", type=date.fromisoformat, default=date.today())
     y.add_argument("--mix", help="slots, e.g. news,history,history (or set STUDIO_MIX)")
     y.add_argument("--format", default="3x4", choices=render.FORMATS)
-    y.add_argument("--no-editor", action="store_true", help="pick by score, not by claude")
+    y.add_argument("--no-editor", action="store_true", help="pick by score, not by the AI editor")
     y.add_argument("--no-send", action="store_true", help="don't post to discord")
 
     a = p.parse_args()
@@ -112,4 +112,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except RuntimeError as e:
+        sys.exit(f"error: {e}")

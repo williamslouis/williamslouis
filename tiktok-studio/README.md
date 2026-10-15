@@ -18,8 +18,13 @@ cd tiktok-studio
 pip install -r requirements.txt
 export STUDIO_CONTACT="you@example.com"   # wikimedia requires a contact in the user agent
 export STUDIO_HANDLE="@yourhandle"
-export ANTHROPIC_API_KEY=...               # only for `draft`; or use --skeleton
+export GEMINI_API_KEY=...                  # free: aistudio.google.com → get api key
 ```
+
+**AI:** drafting, news research and the daily pick use **Gemini** when `GEMINI_API_KEY` is set
+(free tier, default model `gemini-flash-latest`). Set `ANTHROPIC_API_KEY` instead to use Claude.
+If both are set, Gemini wins; force one with `STUDIO_PROVIDER=claude`. Change the model with
+`STUDIO_GEMINI_MODEL` / `STUDIO_MODEL`. `--skeleton` needs no AI at all.
 
 Fonts: Inter Display is bundled in `fonts/` (free, OFL), so nothing to install. To try another,
 see `fonts/README.md`.
@@ -35,7 +40,7 @@ What happens:
 
 1. **find**: ranks today's candidates. Wikipedia's on this day, in the news and most read
    lists, plus the BBC/NPR/Guardian headlines.
-2. **pick**: Claude acts as editor, choosing the best story for each slot in `STUDIO_MIX` and
+2. **pick**: the AI acts as editor, choosing the best story for each slot in `STUDIO_MIX` and
    ranking reserves. It avoids anything close to recent posts.
 3. **draft**: news slots are **researched live with web search** across at least 2 outlets, then
    written from those notes. History slots are written from the Wikipedia article.
@@ -54,7 +59,7 @@ repo's **Settings → Secrets and variables → Actions**:
 
 | name | type | value |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | secret | from console.anthropic.com |
+| `GEMINI_API_KEY` | secret | free from aistudio.google.com (or `ANTHROPIC_API_KEY` for claude) |
 | `STUDIO_DISCORD_WEBHOOK` | secret | Discord: channel settings → integrations → webhooks → copy url |
 | `STUDIO_CONTACT` | variable | your email (wikimedia asks for one) |
 | `STUDIO_HANDLE` | variable | `@yourhandle` |
@@ -63,8 +68,9 @@ repo's **Settings → Secrets and variables → Actions**:
 The workflow file has to sit at the root of a repo's `.github/workflows/`, and scheduled runs only
 happen on the default branch. So this folder works best as its own repository.
 
-Cost: about 4–6 Claude calls a day (1 pick, 3 drafts, research for news slots). Actions minutes
-are free for public repos.
+Cost: about 5–7 AI calls a day (1 pick, 3 drafts, research for news slots), well inside
+Gemini's free tier. On the free tier Google may use your prompts to improve its products, which is
+fine here since everything sent is public news. Actions minutes are free for public repos.
 
 ## by hand
 

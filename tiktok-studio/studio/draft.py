@@ -1,12 +1,11 @@
-"""Write a post.json from a Wikipedia article, using Claude and brand.md.
-
-Without ANTHROPIC_API_KEY (or an `ant auth login` profile) it writes a skeleton you fill in.
+"""Write a post.json from a Wikipedia article (history) or live web research (news), using
+brand.md and whichever AI is configured in llm.py. --skeleton writes a template, no AI needed.
 """
 
 import json
 import re
 
-from . import config, wiki
+from . import config, llm, wiki
 
 SCHEMA = {
     "type": "object",
@@ -75,29 +74,9 @@ def _source_message(art, event):
     return "\n\n".join(p for p in parts if p)
 
 
-def _ask_claude(art, event):
-    import anthropic
-
-    client = anthropic.Anthropic()
-    response = client.beta.messages.create(
-        model=config.MODEL,
-        max_tokens=16000,
-        output_config={"effort": "medium", "format": {"type": "json_schema", "schema": SCHEMA}},
-        # If the request is declined on safety grounds (rare for history, possible for wars and
-        # attacks), the API retries it on a suitable fallback model in the same call.
-        betas=["server-side-fallback-2026-07-01"],
-        fallbacks="default",
-        system=[{"type": "text",
-                 "text": INSTRUCTIONS.format(brand=config.BRAND_FILE.read_text()),
-                 "cache_control": {"type": "ephemeral"}}],
-        messages=[{"role": "user", "content": _source_message(art, event)}],
-    )
-    if response.stop_reason == "refusal":
-        raise RuntimeError("claude declined this story; write it by hand with --skeleton")
-    if response.stop_reason == "max_tokens":
-        raise RuntimeError("draft was cut off; try again")
-    text = next(b.text for b in response.content if b.type == "text")
-    return json.loads(text)
+def _write_post(art, event):
+    return llm.write(INSTRUCTIONS.format(brand=config.BRAND_FILE.read_text()),
+                     _source_message(art, event), SCHEMA)
 
 
 def _skeleton(art, event):
@@ -138,26 +117,8 @@ source you actually read states. Do not speculate. End with:
 
 def research(headline, links=()):
     """Web-researched notes for a fresh story, so the draft has real source text."""
-    import anthropic
-
-    client = anthropic.Anthropic()
-    tools = [{"type": "web_search_20260209", "name": "web_search", "max_uses": 8},
-             {"type": "web_fetch_20260209", "name": "web_fetch", "max_uses": 8}]
-    prompt = RESEARCH.format(headline=headline,
-                             links="\n".join(f"Link: {u}" for u in links if u))
-    messages = [{"role": "user", "content": prompt}]
-    for _ in range(5):  # server tools pause after 10 steps; resend to let them carry on
-        response = client.beta.messages.create(
-            model=config.MODEL, max_tokens=16000, output_config={"effort": "medium"},
-            betas=["server-side-fallback-2026-07-01"], fallbacks="default",
-            tools=tools, messages=messages,
-        )
-        if response.stop_reason != "pause_turn":
-            break
-        messages = [messages[0], {"role": "assistant", "content": response.content}]
-    if response.stop_reason == "refusal":
-        raise RuntimeError("claude declined to research this story")
-    notes = "\n".join(b.text for b in response.content if b.type == "text").strip()
+    notes = llm.research(RESEARCH.format(headline=headline,
+                                         links="\n".join(f"Link: {u}" for u in links if u)))
     if len(notes) < 300:
         raise RuntimeError("research came back too thin to write from")
     return notes
@@ -183,9 +144,9 @@ def _save(post, wikipedia="", url=""):
 def run_news(headline, links=(), angle=""):
     print(f"• researching: {headline}")
     notes = research(headline, links)
-    print(f"• drafting with {config.MODEL}")
+    print(f"• drafting with {llm.model_name()}")
     art = {"title": headline, "url": next((u for u in links if u), ""), "text": notes}
-    post = _ask_claude(art, f"{headline}. {angle}".strip())
+    post = _write_post(art, f"{headline}. {angle}".strip())
     post["kind"] = "news"
     post["headline"] = headline
     post["research"] = notes
@@ -200,12 +161,14 @@ def run_candidate(cand, angle=""):
 
 
 def run(title, event="", skeleton=False):
+    if not skeleton:
+        llm.provider()  # fail before any downloads if no AI key is set
     art = wiki.article(title)
     print(f"• article: {art['title']} ({len(art['text']):,} chars)")
     if skeleton:
         post = _skeleton(art, event)
     else:
-        print(f"• drafting with {config.MODEL}")
-        post = _ask_claude(art, event)
+        print(f"• drafting with {llm.model_name()}")
+        post = _write_post(art, event)
     post["kind"] = "history"
     return _save(post, art["title"], art["url"])
