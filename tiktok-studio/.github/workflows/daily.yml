@@ -1,0 +1,58 @@
+# Makes the day's posts every morning and sends them to Discord.
+# Needs: repo secret ANTHROPIC_API_KEY, repo secret STUDIO_DISCORD_WEBHOOK (optional),
+#        repo variables STUDIO_CONTACT and STUDIO_HANDLE.
+name: daily posts
+
+on:
+  schedule:
+    - cron: "13 5 * * *"   # 05:13 UTC = 06:13 uk summer time, 05:13 winter
+  workflow_dispatch:        # "run workflow" button for a manual run
+    inputs:
+      mix:
+        description: "slots, e.g. news,history,history"
+        required: false
+
+permissions:
+  contents: write           # to commit post.json files, so stories never repeat
+
+concurrency: daily
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: make today's posts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          STUDIO_DISCORD_WEBHOOK: ${{ secrets.STUDIO_DISCORD_WEBHOOK }}
+          STUDIO_CONTACT: ${{ vars.STUDIO_CONTACT }}
+          STUDIO_HANDLE: ${{ vars.STUDIO_HANDLE }}
+          STUDIO_MIX: ${{ inputs.mix || vars.STUDIO_MIX || 'news,history,history' }}
+        run: python -m studio daily
+
+      - name: keep the slides for a week
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: posts-${{ github.run_id }}
+          path: daily/
+          retention-days: 7
+
+      - name: remember what was posted
+        if: always()
+        run: |
+          git config user.name "studio bot"
+          git config user.email "studio-bot@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "posts for $(date -u +%F)"
+          git push

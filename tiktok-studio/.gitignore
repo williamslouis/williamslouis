@@ -3,3 +3,4 @@ posts/*/out/
 posts/*/post.prev.json
 stories/
 __pycache__/
+daily/*/*/

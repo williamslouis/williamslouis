@@ -8,6 +8,7 @@
   python -m studio pick <slug> 4 2           slide 4 → candidate 2 (see images/04-sheet.jpg)
   python -m studio render <slug> [--format 3x4|4x5|9x16]
   python -m studio make "Apollo 11"          draft + images + render in one go
+  python -m studio daily                     3 finished posts for today → daily/<date>/
 """
 
 import argparse
@@ -15,7 +16,7 @@ import json
 import sys
 from datetime import date
 
-from . import config, draft, find, images, render
+from . import config, daily, draft, find, images, render
 
 
 def _folder(slug):
@@ -68,6 +69,13 @@ def main():
     r.add_argument("slug")
     r.add_argument("--format", default="3x4", choices=render.FORMATS)
 
+    y = sub.add_parser("daily", help="pick, draft, illustrate and render today's posts")
+    y.add_argument("--date", type=date.fromisoformat, default=date.today())
+    y.add_argument("--mix", help="slots, e.g. news,history,history (or set STUDIO_MIX)")
+    y.add_argument("--format", default="3x4", choices=render.FORMATS)
+    y.add_argument("--no-editor", action="store_true", help="pick by score, not by claude")
+    y.add_argument("--no-send", action="store_true", help="don't post to discord")
+
     a = p.parse_args()
 
     if a.cmd == "find":
@@ -89,6 +97,11 @@ def main():
             images.run(folder)
             out = render.run(folder, a.format)
             print(f"→ {out}")
+    elif a.cmd == "daily":
+        made = daily.run(a.date, a.format, a.mix.split(",") if a.mix else None,
+                         use_editor=not a.no_editor, send=not a.no_send)
+        if not made:
+            sys.exit(1)
     elif a.cmd == "images":
         images.run(_folder(a.slug), slides=a.slides or None)
     elif a.cmd == "pick":

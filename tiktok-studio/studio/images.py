@@ -43,7 +43,7 @@ def score(info, from_article, query):
 
 def candidates(slide, post, used):
     query = slide.get("image_query") or ""
-    article = slide.get("image_article") or (post["wikipedia"] if slide["kind"] == "hook" else "")
+    article = slide.get("image_article") or (post.get("wikipedia", "") if slide["kind"] == "hook" else "")
     from_article = wiki.article_files(article)[:15] if article else []
     searched = wiki.commons_search(query) if query else []
     infos = wiki.image_info(dict.fromkeys(from_article + searched))
@@ -84,6 +84,7 @@ def run(folder, slides=None, sheets=True):
     all_cands = json.loads((img_dir / "candidates.json").read_text()) \
         if (img_dir / "candidates.json").exists() else {}
     used = {s.get("image_file") for s in post["slides"] if s.get("image_file")}
+    missing = []
 
     for n, slide in enumerate(post["slides"], 1):
         if slides and n not in slides:
@@ -92,10 +93,11 @@ def run(folder, slides=None, sheets=True):
             continue
         if slide.get("image") and not slides:
             continue  # already has one; pass explicit slide numbers to redo
-        print(f"• slide {n}: {slide.get('image_query') or post['wikipedia']}")
+        print(f"• slide {n}: {slide.get('image_query') or post.get('wikipedia', '')}")
         cands = candidates(slide, post, used)
         if not cands:
             print("  no free photo found; edit image_query and rerun")
+            missing.append(n)
             continue
         for i, c in enumerate(cands, 1):
             ext = ".png" if c["mime"] == "image/png" else ".jpg"
@@ -109,6 +111,7 @@ def run(folder, slides=None, sheets=True):
 
     (img_dir / "candidates.json").write_text(json.dumps(all_cands, indent=2, ensure_ascii=False))
     post_path.write_text(json.dumps(post, indent=2, ensure_ascii=False))
+    return missing
 
 
 def choose(post, slide_no, cand, folder):

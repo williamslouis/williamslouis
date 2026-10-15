@@ -126,10 +126,18 @@ def balance(font, text, max_w, tracking):
     return wrap(font, text, hi, tracking)
 
 
+warnings = []  # filled during a run, read by `daily` for the review sheet
+
+
+def warn(msg):
+    print(f"  ! {msg}")
+    warnings.append(msg)
+
+
 def check_copy(n, text):
     words = len(text.split())
     if words > MAX_WORDS:
-        print(f"  ! slide {n}: {words} words (max {MAX_WORDS}). cut it, don't shrink it.")
+        warn(f"slide {n}: {words} words (max {MAX_WORDS}). cut it, don't shrink it.")
 
 
 # --- photo ------------------------------------------------------------------
@@ -179,7 +187,7 @@ def slide(post, n, total, folder, fmt="3x4"):
     check_copy(n, s["text"])
     lines = balance(font, text, W * TEXT_RIGHT - col_x, tracking)
     if len(lines) > MAX_LINES:
-        print(f"  ! slide {n}: {len(lines)} lines (max {MAX_LINES})")
+        warn(f"slide {n}: {len(lines)} lines (max {MAX_LINES})")
     line_h = round(font.size * LEADING)
     text_top = baseline - line_h * (len(lines) - 1) - font.size
 
@@ -237,6 +245,7 @@ def run(folder, fmt="3x4"):
     out.mkdir(parents=True, exist_ok=True)
     for old in out.glob("*.png"):
         old.unlink()
+    warnings.clear()
     total = len(post["slides"])
     for n in range(1, total + 1):
         slide(post, n, total, folder, fmt).save(out / f"{n:02d}.png", optimize=True)

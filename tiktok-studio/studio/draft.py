@@ -93,9 +93,9 @@ def _ask_claude(art, event):
         messages=[{"role": "user", "content": _source_message(art, event)}],
     )
     if response.stop_reason == "refusal":
-        raise SystemExit("claude declined this story; write it by hand with --skeleton")
+        raise RuntimeError("claude declined this story; write it by hand with --skeleton")
     if response.stop_reason == "max_tokens":
-        raise SystemExit("draft was cut off; try again")
+        raise RuntimeError("draft was cut off; try again")
     text = next(b.text for b in response.content if b.type == "text")
     return json.loads(text)
 
@@ -116,17 +116,57 @@ def _skeleton(art, event):
             "caption": f"todo. {lead}", "hashtags": ["#history", "#onthisday"], "fact_check": []}
 
 
-def run(title, event="", skeleton=False):
-    art = wiki.article(title)
-    print(f"• article: {art['title']} ({len(art['text']):,} chars)")
-    if skeleton:
-        post = _skeleton(art, event)
-    else:
-        print(f"• drafting with {config.MODEL}")
-        post = _ask_claude(art, event)
-    post["slug"] = slugify(post.get("slug") or art["title"])
-    post["wikipedia"] = art["title"]
-    post["wikipedia_url"] = art["url"]
+RESEARCH = """Research this news story for a short factual carousel. Use web search and read \
+at least 2 reputable outlets (wire services, national broadcasters, major newspapers). Prefer the \
+links given if they work.
+
+Story: {headline}
+{links}
+
+Write plain-text research notes:
+- what happened, when, where, who, in order
+- the key numbers
+- one line of background a teenager would need
+- what happens next, if reported
+- anything disputed or unconfirmed, labelled as such
+
+After every fact, put the outlet it came from in brackets, e.g. [reuters]. Only include facts a \
+source you actually read states. Do not speculate. End with:
+- a list of the outlets and urls you used
+- 3-6 wikipedia article titles for the people, places or organisations involved (for photos)."""
+
+
+def research(headline, links=()):
+    """Web-researched notes for a fresh story, so the draft has real source text."""
+    import anthropic
+
+    client = anthropic.Anthropic()
+    tools = [{"type": "web_search_20260209", "name": "web_search", "max_uses": 8},
+             {"type": "web_fetch_20260209", "name": "web_fetch", "max_uses": 8}]
+    prompt = RESEARCH.format(headline=headline,
+                             links="\n".join(f"Link: {u}" for u in links if u))
+    messages = [{"role": "user", "content": prompt}]
+    for _ in range(5):  # server tools pause after 10 steps; resend to let them carry on
+        response = client.beta.messages.create(
+            model=config.MODEL, max_tokens=16000, output_config={"effort": "medium"},
+            betas=["server-side-fallback-2026-07-01"], fallbacks="default",
+            tools=tools, messages=messages,
+        )
+        if response.stop_reason != "pause_turn":
+            break
+        messages = [messages[0], {"role": "assistant", "content": response.content}]
+    if response.stop_reason == "refusal":
+        raise RuntimeError("claude declined to research this story")
+    notes = "\n".join(b.text for b in response.content if b.type == "text").strip()
+    if len(notes) < 300:
+        raise RuntimeError("research came back too thin to write from")
+    return notes
+
+
+def _save(post, wikipedia="", url=""):
+    post["slug"] = slugify(post.get("slug") or post["title"])
+    post["wikipedia"] = wikipedia
+    post["wikipedia_url"] = url
     for s in post["slides"]:
         s.setdefault("image", None)
         s.setdefault("focus", [0.5, 0.5])
@@ -138,3 +178,34 @@ def run(title, event="", skeleton=False):
         print("  (kept the old draft as post.prev.json)")
     path.write_text(json.dumps(post, indent=2, ensure_ascii=False))
     return folder
+
+
+def run_news(headline, links=(), angle=""):
+    print(f"• researching: {headline}")
+    notes = research(headline, links)
+    print(f"• drafting with {config.MODEL}")
+    art = {"title": headline, "url": next((u for u in links if u), ""), "text": notes}
+    post = _ask_claude(art, f"{headline}. {angle}".strip())
+    post["kind"] = "news"
+    post["headline"] = headline
+    post["research"] = notes
+    return _save(post)
+
+
+def run_candidate(cand, angle=""):
+    """Draft a candidate from `find`: news gets web research, history drafts from wikipedia."""
+    if cand["kind"] in ("news", "rss", "trending"):
+        return run_news(cand["text"], cand.get("links") or [], angle)
+    return run(cand["wikipedia"], f"{cand['text']} {angle}".strip())
+
+
+def run(title, event="", skeleton=False):
+    art = wiki.article(title)
+    print(f"• article: {art['title']} ({len(art['text']):,} chars)")
+    if skeleton:
+        post = _skeleton(art, event)
+    else:
+        print(f"• drafting with {config.MODEL}")
+        post = _ask_claude(art, event)
+    post["kind"] = "history"
+    return _save(post, art["title"], art["url"])

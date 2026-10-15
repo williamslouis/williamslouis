@@ -19,15 +19,27 @@ from datetime import date, timedelta
 
 from . import config, wiki
 
+_WORD = re.compile(r"[a-z]{4,}")
 
-def _posted_articles():
-    done = set()
+
+def _posted():
+    """Articles and news headlines already covered, so nothing gets posted twice."""
+    articles, headlines = set(), []
     for p in config.POSTS_DIR.glob("*/post.json"):
         try:
-            done.add(json.loads(p.read_text())["wikipedia"].replace("_", " ").lower())
-        except (KeyError, ValueError):
-            pass
-    return done
+            post = json.loads(p.read_text())
+        except ValueError:
+            continue
+        if post.get("wikipedia"):
+            articles.add(post["wikipedia"].replace("_", " ").lower())
+        if post.get("headline"):
+            headlines.append(set(_WORD.findall(post["headline"].lower())))
+    return articles, headlines
+
+
+def _seen_headline(text, headlines):
+    words = set(_WORD.findall(text.lower()))
+    return any(len(words & h) / max(len(words | h), 1) >= 0.3 for h in headlines)
 
 
 def _anniversary_bonus(years):
@@ -109,8 +121,6 @@ def news_and_trending(day):
     return out
 
 
-_WORD = re.compile(r"[a-z]{4,}")
-
 
 def rss(feeds=None):
     """Headlines clustered across outlets. More outlets on one story = bigger story."""
@@ -149,7 +159,7 @@ def rss(feeds=None):
 
 
 def run(start: date, days=1, views=True, use_rss=False, top=25):
-    done = _posted_articles()
+    done, headlines = _posted()
     cands = []
     for i in range(days):
         day = start + timedelta(days=i)
@@ -162,7 +172,8 @@ def run(start: date, days=1, views=True, use_rss=False, top=25):
         print("• rss feeds")
         cands += rss()
 
-    cands = [c for c in cands if c["wikipedia"].replace("_", " ").lower() not in done]
+    cands = [c for c in cands if c["wikipedia"].replace("_", " ").lower() not in done
+             and not (c["kind"] in ("news", "rss") and _seen_headline(c["text"], headlines))]
     cands.sort(key=lambda c: c["score"], reverse=True)
     seen = set()  # one entry per article, keeping the best-scoring one
     cands = [c for c in cands if not c["wikipedia"] or not (c["wikipedia"] in seen or seen.add(c["wikipedia"]))]

@@ -24,14 +24,56 @@ export ANTHROPIC_API_KEY=...               # only for `draft`; or use --skeleton
 Fonts: Inter Display is bundled in `fonts/` (free, OFL), so nothing to install. To try another,
 see `fonts/README.md`.
 
-## daily flow
+## automatic: 3 posts every morning
+
+```bash
+python -m studio daily                          # → daily/<date>/ + review.md
+STUDIO_MIX=news,news,history python -m studio daily
+```
+
+What happens:
+
+1. **find**: ranks today's candidates. Wikipedia's on this day, in the news and most read
+   lists, plus the BBC/NPR/Guardian headlines.
+2. **pick**: Claude acts as editor, choosing the best story for each slot in `STUDIO_MIX` and
+   ranking reserves. It avoids anything close to recent posts.
+3. **draft**: news slots are **researched live with web search** across at least 2 outlets, then
+   written from those notes. History slots are written from the Wikipedia article.
+4. **photos + render**: if a story fails at any step (thin research, under half its slides with
+   photos), the next reserve takes its place.
+5. **review**: `daily/<date>/review.md` has every slide, the flags, the fact check and a caption
+   ready to paste, with suggested times (`STUDIO_TIMES`, default 08:00, 13:00, 19:00).
+6. **send** (optional): with `STUDIO_DISCORD_WEBHOOK` set, each post lands in a Discord channel as
+   slides + caption. On your phone, long-press to save the images, then post them on TikTok.
+
+### running it every day by itself (github actions)
+
+`.github/workflows/daily.yml` runs `daily` at 05:13 UTC, sends to Discord, keeps the slides as a
+download for 7 days, and commits the `post.json` files back so no story repeats. Setup, in the
+repo's **Settings → Secrets and variables → Actions**:
+
+| name | type | value |
+| --- | --- | --- |
+| `ANTHROPIC_API_KEY` | secret | from console.anthropic.com |
+| `STUDIO_DISCORD_WEBHOOK` | secret | Discord: channel settings → integrations → webhooks → copy url |
+| `STUDIO_CONTACT` | variable | your email (wikimedia asks for one) |
+| `STUDIO_HANDLE` | variable | `@yourhandle` |
+| `STUDIO_MIX` | variable | optional, e.g. `news,history,history` |
+
+The workflow file has to sit at the root of a repo's `.github/workflows/`, and scheduled runs only
+happen on the default branch. So this folder works best as its own repository.
+
+Cost: about 4–6 Claude calls a day (1 pick, 3 drafts, research for news slots). Actions minutes
+are free for public repos.
+
+## by hand
 
 ```bash
 python -m studio find                    # → stories/2026-10-15.md, ranked
 python -m studio make --story 1          # draft + photos + render for candidate #1
 ```
 
-Or step by step, which is better when you want control:
+Or step by step:
 
 ```bash
 python -m studio draft --story 3                 # or: draft "Apollo 11"
@@ -45,6 +87,13 @@ python -m studio render <slug> --format 9x16     # full-screen version with the 
 ```
 
 Plan a week ahead: `python -m studio find --days 7 --rss`.
+
+## news photos
+
+Agency news photos (Reuters, AP, Getty) are copyrighted and can't be used. For news posts, the
+photo search uses free photos of the **people, places and organisations involved** from Wikimedia
+Commons, not shots of the event itself. Check those slides in the review: if a photo is off, swap
+it with `pick`.
 
 ## how stories are found
 
