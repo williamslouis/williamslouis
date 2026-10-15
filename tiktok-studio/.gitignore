@@ -2,7 +2,4 @@ posts/*/images/
 posts/*/out/
 posts/*/post.prev.json
 stories/
-fonts/*.ttf
-fonts/*.otf
-fonts/*.ttc
 __pycache__/

@@ -4,7 +4,7 @@ Makes minimal TikTok photo carousels about big news and big moments in history. 
 anything. It finds the story, writes the slides, gets licensed photos and renders the PNGs, and
 you post them yourself.
 
-The look: a white page, a photo set inside it, lowercase Helvetica bold in the bottom right.
+The look: a white page, a photo set inside it, lowercase Inter Display in the bottom right.
 The rulebook is in [`brand.md`](brand.md), and the drafting step reads that file on every run.
 
 ```
@@ -21,8 +21,8 @@ export STUDIO_HANDLE="@yourhandle"
 export ANTHROPIC_API_KEY=...               # only for `draft`; or use --skeleton
 ```
 
-Fonts: put your licensed `Helvetica-Bold.ttf` + `Helvetica.ttf` in `fonts/`. On a Mac the system
-Helvetica is found automatically. Otherwise it falls back to Arial or Liberation Sans.
+Fonts: Inter Display is bundled in `fonts/` (free, OFL), so nothing to install. To try another,
+see `fonts/README.md`.
 
 ## daily flow
 

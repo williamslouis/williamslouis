@@ -6,6 +6,7 @@ one of a few grid positions so the carousel reads like a gallery wall.
 """
 
 import json
+import os
 import re
 from pathlib import Path
 
@@ -33,7 +34,7 @@ GUTTER = 0.037        # space between the two columns
 
 TEXT_SIZE = 0.0453    # one size for every slide and format, fraction of width
 LABEL_SIZE = 0.018    # fraction of width
-TRACKING = 0.02       # fraction of font size
+TRACKING = -0.01      # fraction of font size; inter display likes it slightly tight
 LEADING = 1.16
 MAX_LINES = 4
 MAX_WORDS = 12
@@ -50,23 +51,19 @@ LAYOUTS = {
 # Default rhythm for the middle slides; hook and outcome are always "plate".
 RHYTHM = ["column", "portrait", "band", "square"]
 
+# Inter Display (OFL, bundled in fonts/): flat terminals, no flicks. Point STUDIO_TEXT_FONT /
+# STUDIO_LABEL_FONT at any other file to swap it.
 BOLD_FONTS = [
-    "fonts/Helvetica-Bold.ttf", "fonts/HelveticaNeue-Bold.otf", "fonts/Helvetica-Bold.otf",
-    "fonts/HelveticaNowDisplay-Bold.otf",
-    ("/System/Library/Fonts/Helvetica.ttc", 1),
-    ("/System/Library/Fonts/HelveticaNeue.ttc", 1),
-    "C:/Windows/Fonts/arialbd.ttf",
+    os.environ.get("STUDIO_TEXT_FONT", ""),
+    "fonts/InterDisplay-SemiBold.otf",
+    "/usr/share/fonts/opentype/inter/InterDisplay-SemiBold.otf",
     "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-    "/usr/share/fonts/truetype/croscore/Arimo-Bold.ttf",
 ]
 REGULAR_FONTS = [
-    "fonts/Helvetica.ttf", "fonts/HelveticaNeue.otf", "fonts/Helvetica.otf",
-    "fonts/HelveticaNowDisplay-Regular.otf",
-    ("/System/Library/Fonts/Helvetica.ttc", 0),
-    ("/System/Library/Fonts/HelveticaNeue.ttc", 0),
-    "C:/Windows/Fonts/arial.ttf",
+    os.environ.get("STUDIO_LABEL_FONT", ""),
+    "fonts/InterDisplay-Regular.otf",
+    "/usr/share/fonts/opentype/inter/InterDisplay-Regular.otf",
     "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-    "/usr/share/fonts/truetype/croscore/Arimo-Regular.ttf",
 ]
 _font_cache = {}
 
@@ -75,14 +72,14 @@ def load_font(bold, size):
     key = (bold, size)
     if key not in _font_cache:
         for entry in BOLD_FONTS if bold else REGULAR_FONTS:
-            path, index = entry if isinstance(entry, tuple) else (entry, 0)
-            if not Path(path).is_absolute() and path[1:3] != ":/":
-                path = config.ROOT / path
-            if Path(path).exists():
-                _font_cache[key] = ImageFont.truetype(str(path), size, index=index)
+            if not entry:
+                continue
+            path = Path(entry) if Path(entry).is_absolute() else config.ROOT / entry
+            if path.exists():
+                _font_cache[key] = ImageFont.truetype(str(path), size)
                 break
         else:
-            raise SystemExit("no usable font found; put Helvetica-Bold.ttf in fonts/")
+            raise SystemExit("no usable font found; check fonts/")
     return _font_cache[key]
 
 
@@ -211,7 +208,7 @@ def slide(post, n, total, folder, fmt="3x4"):
     label = config.HANDLE if s["kind"] == "end" else (s.get("label") or s.get("date") or "")
     if label:
         small = load_font(False, round(W * LABEL_SIZE))
-        draw_tracked(draw, margin_x, baseline, label.lower(), small, META, small.size * 0.03)
+        draw_tracked(draw, margin_x, baseline, label.lower(), small, META, 0)
     return canvas
 
 

@@ -1,7 +1,9 @@
-Drop your licensed Helvetica files here (they're git-ignored):
+Bundled: **Inter Display** SemiBold (slide text) and Regular (labels), by Rasmus Andersson,
+under the SIL Open Font License 1.1 (see `LICENSE-Inter.txt`). Free to use and redistribute.
 
-- `Helvetica-Bold.ttf` (or `HelveticaNeue-Bold.otf`) for the main text
-- `Helvetica.ttf` (or `HelveticaNeue.otf`) for the small grey meta text
+To try another font, point an environment variable at the file:
 
-On a Mac the system Helvetica is found automatically. Without either, the renderer falls back to
-Arial on Windows or Liberation Sans on Linux, which share Helvetica's metrics.
+```bash
+export STUDIO_TEXT_FONT=/path/to/SomeFont-Bold.otf
+export STUDIO_LABEL_FONT=/path/to/SomeFont-Regular.otf
+```

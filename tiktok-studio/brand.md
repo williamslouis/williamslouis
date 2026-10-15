@@ -26,11 +26,12 @@ so when something is missing it reads as a decision.
 **The grid** (fractions of width): outer margin 7.3%, text column starts at 44%, text measure
 ends at 90%. Two things never move:
 
-1. **the text**: bottom right, left-aligned on the 44% column, Helvetica Bold, all lowercase,
+1. **the text**: bottom right, left-aligned on the 44% column, Inter Display SemiBold, slightly tight tracking (-1%),
+   all lowercase,
    near-black `#0A0A0A`, **one size on every slide** (4.5% of width), max 4 lines, sitting on a
    fixed baseline (91.8% of height on 3:4).
 2. **the label**: bottom left on the outer margin, same baseline as the last line of text.
-   Helvetica Regular, small, grey `#8C8C8C`. A museum caption: `place, date`. Nothing else.
+   Inter Display Regular, small, grey `#8C8C8C`. A museum caption: `place, date`. Nothing else.
 
 **Only the photo moves**, between five grid positions. That movement is the art direction:
 
