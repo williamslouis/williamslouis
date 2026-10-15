@@ -1,4 +1,9 @@
-"""Render post.json into carousel slides (PNG) plus caption.txt. Layout spec: brand.md section 2."""
+"""Render post.json into carousel slides (PNG) plus caption.txt. Layout spec: brand.md section 2.
+
+The page is a fixed grid. Two things never move: the text column (bottom right, left-aligned,
+one size) and the label (bottom left, on the same baseline). Only the photo moves, snapping to
+one of a few grid positions so the carousel reads like a gallery wall.
+"""
 
 import json
 import re
@@ -11,21 +16,40 @@ from . import config
 BG = "#FFFFFF"
 INK = "#0A0A0A"
 META = "#8C8C8C"
-EMPTY = "#ECECEC"
+EMPTY = "#EDEDED"
 
-# Measured from the reference (1500 x 2000) and kept as fractions so any canvas works.
 FORMATS = {
     #        size          photo top  text baseline
     "3x4":  ((1080, 1440), 0.144, 0.918),
     "4x5":  ((1080, 1350), 0.120, 0.915),
     "9x16": ((1080, 1920), 0.170, 0.760),
 }
-SIDE = 0.073          # photo side margin, fraction of width
-PHOTO_RATIO = 0.75    # photo height / width (4:3)
-TEXT_INSET = 0.027    # text right edge inset from photo right edge, fraction of width
-TRACKING = 0.02       # letter spacing, fraction of font size
 
-# Font lookup: your own files in fonts/ first, then the system.
+# Grid, as fractions of width. Measured from the reference.
+MARGIN = 0.073        # outer margin
+COLUMN = 0.440        # where the text column (and some photos) start
+TEXT_RIGHT = 0.900    # right edge of the text measure
+GUTTER = 0.037        # space between the two columns
+
+TEXT_SIZE = 0.0453    # one size for every slide and format, fraction of width
+LABEL_SIZE = 0.018    # fraction of width
+TRACKING = 0.02       # fraction of font size
+LEADING = 1.16
+MAX_LINES = 4
+MAX_WORDS = 12
+
+# Photo positions on the grid: (left, right, aspect h/w, top offset). left/right are fractions
+# of width; None for top offset means "the format's photo top".
+LAYOUTS = {
+    "plate":    (MARGIN, 1 - MARGIN, 3 / 4, None),           # the reference: wide inset photo
+    "column":   (COLUMN, 1 - MARGIN, 3 / 4, None),           # smaller, sits over the text column
+    "portrait": (MARGIN, COLUMN - GUTTER, 4 / 3, None),      # tall, left column only
+    "band":     (0.0, 1.0, 9 / 16, 0.05),                    # edge to edge, a little lower
+    "square":   (COLUMN, 1 - MARGIN, 1.0, None),             # square over the text column
+}
+# Default rhythm for the middle slides; hook and outcome are always "plate".
+RHYTHM = ["column", "portrait", "band", "square"]
+
 BOLD_FONTS = [
     "fonts/Helvetica-Bold.ttf", "fonts/HelveticaNeue-Bold.otf", "fonts/Helvetica-Bold.otf",
     "fonts/HelveticaNowDisplay-Bold.otf",
@@ -52,8 +76,9 @@ def load_font(bold, size):
     if key not in _font_cache:
         for entry in BOLD_FONTS if bold else REGULAR_FONTS:
             path, index = entry if isinstance(entry, tuple) else (entry, 0)
-            path = config.ROOT / path if not Path(path).is_absolute() and not path[1:3] == ":/" else Path(path)
-            if path.exists():
+            if not Path(path).is_absolute() and path[1:3] != ":/":
+                path = config.ROOT / path
+            if Path(path).exists():
                 _font_cache[key] = ImageFont.truetype(str(path), size, index=index)
                 break
         else:
@@ -62,6 +87,11 @@ def load_font(bold, size):
 
 
 # --- text -------------------------------------------------------------------
+
+NBSP = "\u00a0"
+# keep "155 km", "3 october", "11:30 pm" etc. on one line
+GLUE = re.compile(r"(\d) (?=[a-z%£$€]{1,9}\b)")
+
 
 def text_width(font, s, tracking):
     return font.getlength(s) + tracking * max(len(s) - 1, 0)
@@ -72,11 +102,6 @@ def draw_tracked(draw, x, y, s, font, fill, tracking):
     for i, ch in enumerate(s):
         draw.text((x + font.getlength(s[:i]) + i * tracking, y), ch, font=font, fill=fill,
                   anchor="ls")
-
-
-NBSP = "\u00a0"
-# keep "155 km", "3 october", "11:30 pm" etc. on one line
-GLUE = re.compile(r"(\d) (?=[a-z%£$€]{1,9}\b)")
 
 
 def wrap(font, text, max_w, tracking):
@@ -94,7 +119,7 @@ def wrap(font, text, max_w, tracking):
 def balance(font, text, max_w, tracking):
     """Narrowest width that keeps the same line count: even lines, no one-word last line."""
     lines = wrap(font, text, max_w, tracking)
-    lo, hi = max_w * 0.5, max_w
+    lo, hi = max_w * 0.6, max_w
     while hi - lo > 4:
         mid = (lo + hi) / 2
         if len(wrap(font, text, mid, tracking)) == len(lines):
@@ -104,16 +129,10 @@ def balance(font, text, max_w, tracking):
     return wrap(font, text, hi, tracking)
 
 
-def fit(text, max_w, start, minimum, max_lines):
-    text = GLUE.sub(r"\1" + NBSP, " ".join(text.split()))
-    size = start
-    while True:
-        font = load_font(True, size)
-        tracking = size * TRACKING
-        lines = balance(font, text, max_w, tracking)
-        if len(lines) <= max_lines or size <= minimum:
-            return font, tracking, lines
-        size -= 2
+def check_copy(n, text):
+    words = len(text.split())
+    if words > MAX_WORDS:
+        print(f"  ! slide {n}: {words} words (max {MAX_WORDS}). cut it, don't shrink it.")
 
 
 # --- photo ------------------------------------------------------------------
@@ -136,73 +155,80 @@ def treat(img, mode):
     return img
 
 
+def layout_for(post, n):
+    s = post["slides"][n - 1]
+    if s.get("layout") in LAYOUTS:
+        return s["layout"]
+    if s["kind"] in ("hook", "outcome"):
+        return "plate"
+    middle = [i for i, x in enumerate(post["slides"], 1) if x["kind"] not in ("hook", "outcome", "end")]
+    return RHYTHM[middle.index(n) % len(RHYTHM)] if n in middle else "plate"
+
+
 # --- slide ------------------------------------------------------------------
 
 def slide(post, n, total, folder, fmt="3x4"):
-    (W, H), photo_top, baseline = FORMATS[fmt]
+    (W, H), photo_top, baseline_f = FORMATS[fmt]
     s = post["slides"][n - 1]
     canvas = Image.new("RGB", (W, H), BG)
     draw = ImageDraw.Draw(canvas)
+    baseline = round(H * baseline_f)
+    col_x = round(W * COLUMN)
+    margin_x = round(W * MARGIN)
 
-    x0 = round(W * SIDE)
-    pw = W - 2 * x0
-    ph = round(pw * PHOTO_RATIO)
-    y0 = round(H * photo_top)
-    right = x0 + pw - round(W * TEXT_INSET)
-    meta = load_font(False, round(H * 0.0155))
-    small = load_font(False, round(H * 0.0125))
-    is_end = s["kind"] == "end"
+    font = load_font(True, round(W * TEXT_SIZE))
+    tracking = font.size * TRACKING
+    text = GLUE.sub(r"\1" + NBSP, " ".join(s["text"].lower().split()))
+    check_copy(n, s["text"])
+    lines = balance(font, text, W * TEXT_RIGHT - col_x, tracking)
+    if len(lines) > MAX_LINES:
+        print(f"  ! slide {n}: {len(lines)} lines (max {MAX_LINES})")
+    line_h = round(font.size * LEADING)
+    text_top = baseline - line_h * (len(lines) - 1) - font.size
 
-    if not is_end:
+    if s["kind"] != "end":
+        left, right, aspect, offset = LAYOUTS[layout_for(post, n)]
+        x0, x1 = round(W * left), round(W * right)
+        pw = x1 - x0
+        ph = round(pw * aspect)
+        y0 = round(H * (photo_top + (offset or 0)))
+        # never let a photo crowd the text: keep at least one text line of air above it
+        ph = min(ph, text_top - line_h * 2 - y0)
         if s.get("image") and (folder / s["image"]).exists():
             img = ImageOps.exif_transpose(Image.open(folder / s["image"])).convert("RGB")
             img = treat(cover(img, pw, ph, tuple(s.get("focus") or (0.5, 0.5))),
                         s.get("treatment") or post.get("treatment", "natural"))
             canvas.paste(img, (x0, y0))
         else:
-            draw.rectangle((x0, y0, x0 + pw, y0 + ph), fill=EMPTY)
-            draw.text((x0 + pw / 2, y0 + ph / 2), "no image yet", font=meta, fill=META,
-                      anchor="mm")
+            draw.rectangle((x0, y0, x1, y0 + ph), fill=EMPTY)
 
-        # meta row above the photo: date left, counter (or handle on the hook) right
-        meta_y = y0 - round(H * 0.018)
-        if s.get("date"):
-            draw_tracked(draw, x0, meta_y, s["date"].lower(), meta, META, 0)
-        label = config.HANDLE.lower() if s["kind"] == "hook" else f"{n:02d}/{total:02d}"
-        draw.text((x0 + pw, meta_y), label, font=meta, fill=META, anchor="rs")
-
-        # source under the photo
-        if s.get("source"):
-            draw.text((x0, y0 + ph + round(H * 0.026)), f"source: {s['source']}".lower(),
-                      font=small, fill=META, anchor="ls")
-
-    # main text: bottom right, lowercase, stacked upward from the baseline
-    text = s["text"].lower()
-    if s["kind"] in ("hook", "end"):
-        font, tracking, lines = fit(text, pw * 0.86, round(H * 0.042), round(H * 0.03), 3)
-    else:
-        font, tracking, lines = fit(text, pw * 0.86, round(H * 0.030), round(H * 0.022), 5)
-    line_h = round(font.size * 1.18)
-    y = round(H * baseline) - line_h * (len(lines) - 1)
+    y = baseline - line_h * (len(lines) - 1)
     for line in lines:
-        draw_tracked(draw, right - text_width(font, line, tracking), y, line, font, INK, tracking)
+        draw_tracked(draw, col_x, y, line, font, INK, tracking)
         y += line_h
 
-    if is_end:
-        draw.text((right, round(H * baseline) + round(H * 0.03)), config.HANDLE.lower(),
-                  font=meta, fill=META, anchor="rs")
+    # the label: bottom left, same baseline as the last line of text
+    label = config.HANDLE if s["kind"] == "end" else (s.get("label") or s.get("date") or "")
+    if label:
+        small = load_font(False, round(W * LABEL_SIZE))
+        draw_tracked(draw, margin_x, baseline, label.lower(), small, META, small.size * 0.03)
     return canvas
 
 
 def caption(post):
-    credits = []
+    sources, credits = [], []
     for s in post["slides"]:
+        for src in (s.get("source") or "").split(","):
+            if src.strip() and src.strip().lower() not in sources:
+                sources.append(src.strip().lower())
         c = s.get("credit")
         if c:
             line = f"{c['artist'] or 'unknown'} / {c['license']}".strip()
             if line not in credits:
                 credits.append(line)
     parts = [post.get("caption", "").lower(), " ".join(post.get("hashtags", []))]
+    if sources:
+        parts.append("sources: " + ", ".join(sources))
     if credits:
         parts.append("photos: " + ", ".join(credits))
     return "\n\n".join(p for p in parts if p) + "\n"

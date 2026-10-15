@@ -20,58 +20,73 @@ should finish the carousel knowing one story properly, in under 30 seconds.
 
 ## 2. the look
 
-Based on the reference: white page, one photograph sitting inside it, a single line of heavy
-Helvetica in the bottom right. Nothing else competes.
+Minimal on purpose, not minimal because it's unfinished. Every slide is built on the same grid,
+so when something is missing it reads as a decision.
 
-| element | spec (3:4 canvas, 1080 × 1440) |
-| --- | --- |
-| background | pure white `#FFFFFF` |
-| photo | inset box, 7.3% side margins, top at 14.4% of height, 4:3 landscape, no border, no rounding, no shadow |
-| main text | Helvetica Bold (fallback: Liberation Sans Bold / Arial Bold), **all lowercase**, near-black `#0A0A0A`, slight positive tracking, right-aligned to the photo's right edge minus 2.7%, baseline at 91.8% of height |
-| meta text | Helvetica Regular, lowercase, grey `#8C8C8C`, small. Date top-left above the photo, slide counter top-right, source under the photo on the left |
-| colour | none. The photo is the only colour on the slide |
-| graphics | none. No logos, stickers, emoji, arrows, gradients or boxes |
+**The grid** (fractions of width): outer margin 7.3%, text column starts at 44%, text measure
+ends at 90%. Two things never move:
 
-Other canvases: `4x5` (1080 × 1350) and `9x16` (1080 × 1920). In 9:16 the text sits higher
-(baseline 76%) so TikTok's caption and buttons don't cover it.
+1. **the text**: bottom right, left-aligned on the 44% column, Helvetica Bold, all lowercase,
+   near-black `#0A0A0A`, **one size on every slide** (4.5% of width), max 4 lines, sitting on a
+   fixed baseline (91.8% of height on 3:4).
+2. **the label**: bottom left on the outer margin, same baseline as the last line of text.
+   Helvetica Regular, small, grey `#8C8C8C`. A museum caption: `place, date`. Nothing else.
 
-Photo treatment: `natural` by default. Use `muted` (less saturation) when photos from different
-decades sit in one carousel and need to feel like a set, `mono` for anything pre-1960 or when
-colour photos would clash with black-and-white ones.
+**Only the photo moves**, between five grid positions. That movement is the art direction:
+
+| layout | photo | used for |
+| --- | --- | --- |
+| `plate` | full width inside the margins, 4:3 (the reference) | hook, outcome |
+| `column` | over the text column only, 4:3 | context, quiet beats |
+| `portrait` | left column only, tall 3:4 | people, single objects |
+| `band` | edge to edge, 16:9, a little lower | crowds, places, scale |
+| `square` | over the text column, 1:1 | details, documents |
+
+Default rhythm: `plate` → `column` → `portrait` → `band` → `square` → … → `plate`. The end
+slide has no photo, just the line and the handle as its label.
+
+**What's not on a slide:** slide counters, handles (except the end slide), sources (they go in
+the caption), logos, icons, emoji, arrows, boxes, rounded corners, shadows, gradients, grain.
+
+Photo treatment: `natural` by default. `muted` when photos from different decades need to feel
+like one set, `mono` for anything pre-1960 or when colour and black-and-white would clash.
+
+Canvases: `3x4` (1080 × 1440, default), `4x5`, and `9x16`, where the baseline rises to 76% so
+TikTok's caption and buttons don't cover the text.
 
 ---
 
 ## 3. the carousel
 
-6 to 8 slides. Structure borrowed from the best-performing explainer carousels: a hook,
-then a short chronological story where every slide is one fact with a source, then the outcome.
+6 to 8 slides. A hook, a short chronological story, the outcome, a quiet end.
 
-| # | slide | what it does | words |
-| --- | --- | --- | --- |
-| 1 | **hook** | the most striking true sentence about the story. Strongest photo. | 4–10 |
-| 2 | **context** | who/what/where, explained so a 14-year-old gets it | 15–30 |
-| 3–5 | **beats** | what happened, in order. One fact per slide. Start with the date | 15–30 |
-| 6 | **turn** | the surprising detail, the human moment, or the mistake | 15–30 |
-| 7 | **outcome** | what it changed, with a number if possible | 15–30 |
-| 8 | **end** (optional) | text only, no photo: a quiet line + follow prompt | 3–10 |
+| # | slide | what it does |
+| --- | --- | --- |
+| 1 | **hook** | the most striking true sentence about the story. Strongest photo. |
+| 2 | **context** | who/what/where, in plain words |
+| 3–5 | **beats** | what happened, in order. One fact per slide |
+| 6 | **turn** | the surprising detail, the human moment, or the mistake |
+| 7 | **outcome** | what it changed |
+| 8 | **end** | no photo: a quiet line |
 
-Every fact slide carries a `source` line (publication names, not URLs), shown small under the
-photo. Every slide gets its own photo; never reuse one inside a carousel.
+**One sentence per slide, 12 words at most.** If a fact needs more, split it over two slides or
+move the detail to the caption. Never shrink the text to fit: the renderer warns when a slide is
+over. The time and place go in the label, so the sentence doesn't have to carry them.
+
+Every slide gets its own photo, and every fact slide still has a `source`. The sources are
+collected into the caption.
 
 ---
 
 ## 4. voice
 
-- **lowercase everything**, including names, places and the start of sentences. Proper acronyms
-  stay readable: write `nasa`, `un`, `bbc` in lowercase too.
-- Short declarative sentences. Full stops, no exclamation marks, no question marks on fact slides.
-- Lead fact slides with time: "in 1961, …", "at 6:53pm, …", "two days later, …".
-- Explain anything technical in plain words, once: "graphene os, free software that replaces the
-  system running your phone".
-- Digits for numbers (`3`, `1,300`, `£2m`), and give them scale ("about the population of leeds").
+- **lowercase everything**, including names, places and acronyms (`nasa`, `un`, `bbc`).
+- One short declarative sentence. Full stops. No exclamation marks.
+- Cut until it hurts: drop "the government of", "it is said that", "in fact".
+- Explain anything technical in plain words, once.
+- Digits for numbers (`3`, `1,300`, `£2m`).
 - No adjectives doing the work: not "shocking", "insane", "heartbreaking". Let the fact land.
-- No opinions, no "we think", no moralising. If people disagree about something, say who
-  says what.
+- No opinions, no moralising. If people disagree, say who says what.
 - No emoji, no hashtags on slides, no "you won't believe".
 
 ### hook patterns
@@ -97,6 +112,7 @@ whisper. Never "smash that follow button".
 - Caption: 1–2 lowercase sentences that add one detail not on the slides, then the date.
 - 3–5 hashtags: 1 broad (`#history` or `#news`), 1–2 topic (`#coldwar`, `#space`),
   1 place, optionally `#onthisday`. No tag spam.
+- Sources go after the hashtags: `sources: bbc, wikipedia`. Added automatically.
 - Image credits go at the end of the caption: `photos: name / licence, name / licence`.
   This is required for CC BY / CC BY-SA images.
 

@@ -6,26 +6,25 @@
   "wikipedia": "Fall of the Berlin Wall",
   "wikipedia_url": "https://en.wikipedia.org/wiki/Fall_of_the_Berlin_Wall",
   "slides": [
-    {"kind": "hook", "text": "the night the berlin wall opened by mistake.", "date": "09.11.1989", "source": "",
+    {"kind": "hook", "text": "the night the berlin wall opened by mistake.", "label": "berlin, 9.11.1989", "source": "",
      "image_query": "Berlin Wall November 1989 crowd Brandenburg Gate", "image_article": "Fall of the Berlin Wall", "image": null, "focus": [0.5, 0.5]},
-    {"kind": "context", "text": "in 1961, east germany built a wall around west berlin to stop its own people leaving. it ran for about 155 km.", "date": "13.08.1961", "source": "wikipedia, bbc",
+    {"kind": "context", "text": "in 1961, east germany built a wall around west berlin.", "label": "berlin, 1961", "source": "wikipedia, bbc",
      "image_query": "Berlin Wall construction 1961", "image_article": "Berlin Wall", "image": null, "focus": [0.5, 0.5]},
-    {"kind": "beat", "text": "on 9 november 1989, the government planned to ease travel rules. spokesman günter schabowski was handed the note just before a live press conference.", "date": "09.11.1989", "source": "wikipedia, bbc",
-     "image_query": "Günter Schabowski press conference 1989", "image_article": "Günter Schabowski", "image": null, "focus": [0.5, 0.4]},
-    {"kind": "turn", "text": "asked when the rules started, he checked the note and said: “immediately, without delay.” they were meant to start the next day.", "date": "18:53, 09.11.1989", "source": "wikipedia, the guardian",
+    {"kind": "beat", "text": "28 years later, it planned to ease travel rules.", "label": "east berlin, 1989", "source": "wikipedia, bbc",
+     "image_query": "Günter Schabowski 1989", "image_article": "Günter Schabowski", "image": null, "focus": [0.5, 0.3]},
+    {"kind": "turn", "text": "asked when, a spokesman read his note: “immediately.”", "label": "press conference, 18:53", "source": "wikipedia, the guardian",
      "image_query": "Schabowski Pressekonferenz 9 November 1989", "image_article": "", "image": null, "focus": [0.5, 0.4]},
-    {"kind": "beat", "text": "thousands went straight to the border. at 11:30pm, with no orders, guard harald jäger opened the gate at bornholmer straße.", "date": "23:30, 09.11.1989", "source": "wikipedia, bbc",
+    {"kind": "beat", "text": "it was meant for the next day. crowds came anyway.", "label": "bornholmer straße, 23:30", "source": "wikipedia, bbc",
      "image_query": "Bornholmer Straße border crossing November 1989", "image_article": "Bornholmer Straße border crossing", "image": null, "focus": [0.5, 0.5]},
-    {"kind": "outcome", "text": "less than a year later, on 3 october 1990, east and west germany became one country again.", "date": "03.10.1990", "source": "wikipedia, bbc",
+    {"kind": "outcome", "text": "within a year, germany was one country again.", "label": "berlin, 3.10.1990", "source": "wikipedia, bbc",
      "image_query": "German reunification 3 October 1990 Reichstag", "image_article": "German reunification", "image": null, "focus": [0.5, 0.5]},
-    {"kind": "end", "text": "one moment a day.", "date": "", "source": "", "image_query": "", "image_article": "", "image": null, "focus": [0.5, 0.5]}
+    {"kind": "end", "text": "one moment a day.", "label": "", "source": "", "image_query": "", "image_article": "", "image": null, "focus": [0.5, 0.5]}
   ],
-  "caption": "the new travel rules were due to start on 10 november. one answer at a press conference moved them forward, and ended 28 years of the wall. 9 november 1989.",
+  "caption": "at 23:30, with no orders, guard harald jäger opened the gate at bornholmer straße. the wall had stood for 28 years. 9 november 1989.",
   "hashtags": ["#history", "#onthisday", "#berlinwall", "#coldwar", "#germany"],
   "fact_check": [
-    "wall built from 13 august 1961 — wikipedia: berlin wall",
-    "about 155 km around west berlin — wikipedia: berlin wall",
-    "schabowski 'immediately, without delay' (sofort, unverzüglich) — wikipedia: fall of the berlin wall",
+    "wall built from 13 august 1961 around west berlin — wikipedia: berlin wall",
+    "schabowski: 'immediately, without delay' (sofort, unverzüglich), rules meant to start 10 november — wikipedia: fall of the berlin wall",
     "harald jäger opened bornholmer straße about 23:30 — wikipedia: fall of the berlin wall",
     "reunification 3 october 1990 — wikipedia: german reunification"
   ]

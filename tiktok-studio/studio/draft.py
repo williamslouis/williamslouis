@@ -22,15 +22,18 @@ SCHEMA = {
                 "properties": {
                     "kind": {"type": "string", "enum": ["hook", "context", "beat", "turn",
                                                          "outcome", "end"]},
-                    "text": {"type": "string"},
-                    "date": {"type": "string", "description": "short label, e.g. 09.11.1989, or ''"},
+                    "text": {"type": "string", "description": "one sentence, max 12 words"},
+                    "label": {"type": "string",
+                              "description": "museum-style caption: place, date. e.g. 'berlin, 9.11.1989'"},
+                    "layout": {"type": "string",
+                               "enum": ["auto", "plate", "column", "portrait", "band", "square"]},
                     "source": {"type": "string", "description": "outlet names, e.g. 'bbc, wikipedia'"},
                     "image_query": {"type": "string",
                                     "description": "wikimedia commons search for a real photo of this exact moment; '' for end slide"},
                     "image_article": {"type": "string",
                                       "description": "wikipedia article title whose photos fit this slide, or ''"},
                 },
-                "required": ["kind", "text", "date", "source", "image_query", "image_article"],
+                "required": ["kind", "text", "label", "layout", "source", "image_query", "image_article"],
                 "additionalProperties": False,
             },
         },
@@ -99,12 +102,14 @@ def _ask_claude(art, event):
 
 def _skeleton(art, event):
     lead = art["text"].split("\n")[0][:400]
-    slides = [{"kind": "hook", "text": "todo: hook line.", "date": "", "source": "",
+    slides = [{"kind": "hook", "text": "todo: hook line.", "label": "", "layout": "auto", "source": "",
                "image_query": art["title"], "image_article": art["title"]}]
     for kind in ("context", "beat", "beat", "turn", "outcome"):
-        slides.append({"kind": kind, "text": f"todo: {kind}.", "date": "", "source": "wikipedia",
+        slides.append({"kind": kind, "text": f"todo: {kind}.", "label": "", "layout": "auto",
+                       "source": "wikipedia",
                        "image_query": art["title"], "image_article": ""})
-    slides.append({"kind": "end", "text": "one moment a day.", "date": "", "source": "",
+    slides.append({"kind": "end", "text": "one moment a day.", "label": "", "layout": "auto",
+                   "source": "",
                    "image_query": "", "image_article": ""})
     return {"slug": slugify(art["title"]), "title": art["title"], "event_date": "",
             "treatment": "natural", "slides": slides,
